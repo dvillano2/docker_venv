@@ -17,7 +17,6 @@ IMAGE="${PROJECT}-venv"
 # Container name
 CONTAINER="${PROJECT}-container"
 
-
 # If there's no requirements.txt, make an empty one
 if [ ! -f "requirements.txt" ]; then
 	touch requirements.txt
@@ -32,19 +31,19 @@ if [ ! -f "Dockerfile.dev" ]; then
 	echo "If so, respond with 'y' and make changes to Dockerfile.dev"
 	echo "Respond with y/n"
 	echo
-	read response
+	read -r response
 	if [ "$response" = "y" ]; then
 		exit 0
 	fi
 fi
 
 # If the image doesn't exits build it
-if ! docker image inspect "$IMAGE" > /dev/null 2>&1; then
+if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
 	docker build -t "$IMAGE" -f Dockerfile.dev .
 fi
 
 # Find out if the container exists and is running. If not make one/ start it
-if docker container inspect "$CONTAINER" > /dev/null 2>&1; then
+if docker container inspect "$CONTAINER" >/dev/null 2>&1; then
 	running="$(docker container inspect "$CONTAINER" --format '{{.State.Running}}')"
 	if [ "$running" = "false" ]; then
 		docker start "$CONTAINER"
