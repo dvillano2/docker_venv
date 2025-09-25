@@ -19,43 +19,43 @@ CONTAINER="${PROJECT}-container"
 
 # If there's no requirements.txt, make an empty one
 if [ ! -f "requirements.txt" ]; then
-	touch requirements.txt
+  touch requirements.txt
 fi
 
 # If no dockerfile, make a template
 if [ ! -f "Dockerfile.dev" ]; then
-	cp ~/Dockerfile_template.txt Dockerfile.dev
-	cat Dockerfile.dev
-	echo
-	echo "This is the Dockerfile, do you want to make changes?"
-	echo "If so, respond with 'y' and make changes to Dockerfile.dev"
-	echo "Respond with y/n"
-	echo
-	read -r response
-	if [ "$response" = "y" ]; then
-		exit 0
-	fi
+  cp ~/Dockerfile_template.txt Dockerfile.dev
+  cat Dockerfile.dev
+  echo
+  echo "This is the Dockerfile, do you want to make changes?"
+  echo "If so, respond with 'y' and make changes to Dockerfile.dev"
+  echo "Respond with y/n"
+  echo
+  read -r response
+  if [ "$response" = "y" ]; then
+    exit 0
+  fi
 fi
 
 # If the image doesn't exits build it
-if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
-	docker build -t "$IMAGE" -f Dockerfile.dev .
+if ! docker image inspect "$IMAGE" > /dev/null 2>&1; then
+  docker build -t "$IMAGE" -f Dockerfile.dev .
 fi
 
 # Find out if the container exists and is running. If not make one/ start it
-if docker container inspect "$CONTAINER" >/dev/null 2>&1; then
-	running="$(docker container inspect "$CONTAINER" --format '{{.State.Running}}')"
-	if [ "$running" = "false" ]; then
-		docker start "$CONTAINER"
-	fi
+if docker container inspect "$CONTAINER" > /dev/null 2>&1; then
+  running="$(docker container inspect "$CONTAINER" --format '{{.State.Running}}')"
+  if [ "$running" = "false" ]; then
+    docker start "$CONTAINER"
+  fi
 else
-	docker run -dit \
-		-e TERM="$TERM" \
-		-v "$PROJECT_DIR:/workspace" \
-		-v "$HOME/.vim:/root/.vim" \
-		-v "$HOME/.vimrc:/root/.vimrc" \
-		--name "$CONTAINER" \
-		"$IMAGE"
+  docker run -dit \
+    -e TERM="$TERM" \
+    -v "$PROJECT_DIR:/workspace" \
+    -v "$HOME/.vim:/root/.vim" \
+    -v "$HOME/.vimrc:/root/.vimrc" \
+    --name "$CONTAINER" \
+    "$IMAGE"
 fi
 
 # Attach to the container
